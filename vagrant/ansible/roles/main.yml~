@@ -1,0 +1,9 @@
+---
+- hosts: controller
+  user: vagrant
+  sudo: true
+  roles:
+    - elasticsearch
+    - kibana
+    - logstash
+    - redis

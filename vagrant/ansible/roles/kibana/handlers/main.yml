@@ -1,0 +1,7 @@
+---
+- name: init kibana
+  command: sudo update-rc.d kibana defaults 95 10
+  notify: restart kibana
+
+- name: restart kibana
+  service: name=kibana state=restarted enabled=yes

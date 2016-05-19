@@ -1,0 +1,3 @@
+# install java
+- name: Install Java
+  apt: name=openjdk-7-jdk state=present update_cache=yes cache_valid_time=3600

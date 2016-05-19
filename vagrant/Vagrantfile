@@ -1,0 +1,74 @@
+$install_ansible1_9_6 =  <<SCRIPT
+  sudo apt-get -y install software-properties-common
+  sudo apt-add-repository ppa:ansible/ansible-1.9
+  sudo apt-get update
+  sudo apt-get -y install ansible=1.9.6-1ppa~trusty
+SCRIPT
+
+groups = {
+  "loggers" => ["node01", "node02"],
+  "controller" => ["controller"]
+}
+
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = 'ubuntu/trusty64'
+  config.ssh.forward_agent = true
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+  config.vm.define 'controller' do |machine|
+  machine.vm.hostname = "controller"
+  # workaround for https://github.com/mitchellh/vagrant/issues/6793
+  machine.vm.provision "shell", inline: $install_ansible1_9_6
+  machine.vm.provision "ansible_local" do |ansible|
+    ansible.sudo = true
+    ansible.groups = groups
+    ansible.playbook = "ansible/common.yml"
+  end
+    machine.vm.network "private_network", ip: "192.168.0.101"
+    machine.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vb.customize ["modifyvm", :id, "--memory", 2048]
+      vb.customize ["modifyvm", :id, "--name", "controller"]
+      vb.gui = true
+    end
+  end
+
+  config.vm.define "node01" do |machine|
+  machine.vm.hostname = "node01"
+  # workaround for https://github.com/mitchellh/vagrant/issues/6793
+  machine.vm.provision "shell", inline: $install_ansible1_9_6
+  machine.vm.provision "ansible_local" do |ansible|
+    ansible.sudo = true
+    ansible.groups = groups
+    ansible.playbook = "ansible/common.yml"
+  end
+    machine.vm.network "private_network", ip: "192.168.0.102"
+    machine.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vb.customize ["modifyvm", :id, "--memory", 1048]
+      vb.customize ["modifyvm", :id, "--name", "node01"]
+      vb.gui = true
+    end
+  end
+
+  config.vm.define "node02" do |machine|
+  machine.vm.hostname = "node02"
+  # workaround for https://github.com/mitchellh/vagrant/issues/6793
+  machine.vm.provision "shell", inline: $install_ansible1_9_6
+  machine.vm.provision "ansible_local" do |ansible|
+    ansible.sudo = true
+    ansible.groups = groups
+    ansible.playbook = "ansible/common.yml"
+  end
+    machine.vm.network "private_network", ip: "192.168.0.103"
+     machine.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vb.customize ["modifyvm", :id, "--memory", 1048]
+      vb.customize ["modifyvm", :id, "--name", "node02"]
+      vb.gui = true
+    end
+  end
+
+end

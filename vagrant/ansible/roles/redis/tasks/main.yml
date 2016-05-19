@@ -1,0 +1,10 @@
+- name: Add Redis Repo into source list
+  apt_repository: repo='ppa:chris-lea/redis-server' state=present update_cache=yes
+
+- name: Install Redis
+  apt: name=redis-server state=present update_cache=yes cache_valid_time=3600
+  notify: restart redis
+
+- name: Configure Redis
+  template: src=redis.j2 dest=/etc/redis/redis.conf owner=root group=root mode=0644
+  notify: restart redis

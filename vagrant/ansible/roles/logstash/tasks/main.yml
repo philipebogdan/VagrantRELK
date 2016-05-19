@@ -1,0 +1,36 @@
+- name: Import Elastic GPG Key
+  apt_key: url=http://packages.elasticsearch.org/GPG-KEY-elasticsearch state=present
+
+- name: Add Logstash Repo into source list
+#  apt_repository: repo='deb http://packages.elasticsearch.org/logstash/{{logstash_repo_version}}/debian stable main' state=present update_cache=yes
+  apt_repository: repo='deb http://packages.elasticsearch.org/logstash/2.0/debian stable main' state=present update_cache=yes
+
+- name: Install Logstash
+  apt: name=logstash state=present update_cache=yes cache_valid_time=3600
+  with_items:
+   - logstash
+   - logstash-contrib
+  notify: restart logstash
+
+
+- name: Adjust init.d permissions
+  lineinfile: dest=/etc/init.d/logstash regexp="^LS_USER=" line="LS_USER=root" state=present backup=yes
+  notify: restart logstash
+
+- name: Adjust init.d permissions
+  lineinfile: dest=/etc/init.d/logstash regexp="^LS_GROUP=" line="LS_GROUP=root" state=present backup=yes
+  notify: restart logstash
+
+- name: Create Logstash Redis configuration
+  template: src=logstash-shipper.conf dest="/etc/logstash/conf.d/logstash-shipper.conf" owner=root group=root mode=0644
+  notify: restart logstash
+
+- name: Create Logstash Elasticsearch configuration
+  template: src=logstash-indexer.conf dest="/etc/logstash/conf.d/logstash-indexer.conf" owner=root group=root mode=0644
+  when: inventory_hostname == "controller"
+  notify: restart logstash
+  
+- name: Add log filters
+  template: src=syslog_filter.conf dest="/etc/logstash/conf.d/syslog_filter.conf" owner=root group=root mode=0644
+  when: inventory_hostname == "controller"
+  notify: restart logstash

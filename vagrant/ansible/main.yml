@@ -1,0 +1,21 @@
+---
+- name: PROVISION CONTROLLER
+  hosts: controller
+  user: root
+  sudo: true
+  roles:
+  - jdk
+  - redis
+  - elasticsearch
+  - kibana
+  - logstash
+  - test_show
+
+- name: PROVISION LOGGERS 
+  hosts: loggers
+  remote_user: root
+  sudo: true
+  roles:
+  - jdk
+  - logstash
+  - test_show

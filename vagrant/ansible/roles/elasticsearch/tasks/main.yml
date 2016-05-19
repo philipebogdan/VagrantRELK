@@ -1,0 +1,22 @@
+# Import Elasticsearch GPG key
+- name: adding elasticsearch gpg key
+  apt_key: url=http://packages.elasticsearch.org/GPG-KEY-elasticsearch state=present
+
+# Add Elasticsearch Repo into source list
+- name: add elasticsearch repository
+  apt_repository: repo='deb http://packages.elasticsearch.org/elasticsearch/2.x/debian stable main' state=present
+
+# Install Elasticsearch
+- name: install elasticsearch
+  apt: name=elasticsearch state=present update_cache=yes cache_valid_time=3600
+  notify: init elasticsearch
+
+# Set limits.conf
+- name: limits.conf tuning
+  lineinfile: dest=/etc/security/limits.conf line="{{ item }}"
+  tags: elasticsearch
+  with_items:
+    - 'elasticsearch soft nofile 32000'
+    - 'elasticsearch hard nofile 32000'
+  notify: restart elasticsearch
+
