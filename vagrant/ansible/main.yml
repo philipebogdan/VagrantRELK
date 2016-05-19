@@ -1,6 +1,6 @@
 ---
 - name: PROVISION CONTROLLER
-  hosts: controller
+  hosts: controllers
   user: root
   sudo: true
   roles:

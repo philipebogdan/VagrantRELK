@@ -27,10 +27,10 @@
 
 - name: Create Logstash Elasticsearch configuration
   template: src=logstash-indexer.conf dest="/etc/logstash/conf.d/logstash-indexer.conf" owner=root group=root mode=0644
-  when: inventory_hostname == "controller"
+  when: inventory_hostname == "master"
   notify: restart logstash
   
 - name: Add log filters
   template: src=syslog_filter.conf dest="/etc/logstash/conf.d/syslog_filter.conf" owner=root group=root mode=0644
-  when: inventory_hostname == "controller"
+  when: inventory_hostname == "master"
   notify: restart logstash
