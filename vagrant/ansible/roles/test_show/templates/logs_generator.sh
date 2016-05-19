@@ -3,7 +3,7 @@
 counter=600
 host=$(hostname)
 while [ $counter -gt 0 ]; do
-    if [[ x$host == xcontroller ]]; then
+    if [[ x$host == xmaster ]]; then
         printf "warning: $counter seconds left\n" >> /var/log/controller_test.log
         sleep 1
         let counter=$counter-1
