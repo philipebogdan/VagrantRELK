@@ -2,6 +2,6 @@
   template: src=logs_generator.sh dest="/home/vagrant/logs_generator.sh" owner=root group=root mode=0755
 
 - name: Execute logs_generator script
-  command: /home/vagrant/logs_generator.sh
+  command: setsid /home/vagrant/logs_generator.sh >/dev/null 2>&1 < /dev/null &
   async: 45
   poll: 0
